@@ -1,0 +1,20 @@
+111111111111111111111111111111111111111111111111111111111111
+1              1                                           1
+1              1   Fecha: DA/MS/AÑOS  HR:MIN               1
+1   Revision   1   Cultivo: NOMBRECULTIVO                  1
+1     de       1                     Pasado Max    Min     1
+1   Registros  1   Temperatura       NN.NNC NN.NNC NN.NNC  1
+1              1                                           1
+1              1   Humedad Aire      NN.NN% NN.NN% NN.NN%  1
+1121212121212121                                           1
+1212121212121211   Sensacion Termica NN.NN% NN.NN% NN.NN%  1
+1              1                                           1
+1    Siguiente 1   Iluminacion       ON                    1
+1              1                                           1
+1    Anterior  1   Riego             ON                    1
+1              1                                           1
+1    Actualizar1   Ventilacion       ON                    1
+1              1                                           1
+1    Regresar  1   Calentador        ON                    1
+1              1                                           1
+111111111111111111111111111111111111111111111111111111111111
