@@ -95,10 +95,16 @@ int printImagenFondo(int numeroFondo){
       return 0;
 }
 void imprimeConsolin(char *frase){
+     int x;
     textbackground(0);
-                gotoxy(34,18);
-                printf("%s", frase);
+    gotoxy(34,18);
+    printf("%s", frase);
+    getch();
+    gotoxy(34,18);
+    for(x=1;x<=25;x++)
+            putchar(176);
     textbackground(COLORFONDO);
+    
     return;      
 }
 
@@ -111,7 +117,7 @@ int main(){
     printImagenFondo(1);
     getch();
     printImagenFondo(2);
-    imprimeConsolin("adsfadfadsfads");
+    imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
     getch();
     /*while(1){
     getData();

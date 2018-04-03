@@ -1,6 +1,6 @@
 [Project]
-FileName=Centro15_03.dev
-Name=Project1
+FileName=HidroponiaEnC.dev
+Name=HidroponiaEnC
 UnitCount=1
 Type=1
 Ver=1
@@ -13,7 +13,7 @@ MakeIncludes=
 Compiler=
 CppCompiler=
 Linker=-lconio
-IsCpp=1
+IsCpp=0
 Icon=
 ExeOutput=
 ObjectOutput=
@@ -30,8 +30,8 @@ CompilerSet=0
 CompilerSettings=
 
 [Unit1]
-FileName=SobreC.cpp
-CompileCpp=1
+FileName=Centro.c
+CompileCpp=0
 Folder=
 Compile=1
 Link=1
