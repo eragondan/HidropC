@@ -1,0 +1,29 @@
+# Project: Configuraciones
+# Makefile created by Dev-C++ 4.9.9.1
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = ConfigPrin.o $(RES)
+LINKOBJ  = ConfigPrin.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib" -lconio 
+INCS =  -I"C:/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Dev-Cpp/include/c++/3.3.1"  -I"C:/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Dev-Cpp/include" 
+BIN  = Configuraciones.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before Configuraciones.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "Configuraciones.exe" $(LIBS)
+
+ConfigPrin.o: ConfigPrin.c
+	$(CC) -c ConfigPrin.c -o ConfigPrin.o $(CFLAGS)

@@ -99,7 +99,7 @@
      char direccion[50]="Registros.txt";
      system("mode con: cols=61 lines=20");
      checaTodos();
-     //while(1)
+     while(1)
      for(t=1;t<=4;t++){
      printImagenFondo(t);
      getch();

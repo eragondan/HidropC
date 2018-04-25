@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
+#include <time.h>
+#include <string.h>
 #include <Windows.h>
 #include "rs232.c"
 #define COLORFONDO 9
 #define COLORCONTRASTE 10
 
-int cport_nr=2  ,        //Puerto donde se coloca el arduino menos uno COM1=0
+int cport_nr=5  ,        //Puerto donde se coloca el arduino menos uno COM1=0
   bdrate=9600;       //Tiempo sincrono con arduino, Estandar: 9600
 
 struct moldePixel{
@@ -19,18 +21,22 @@ struct moldeImagen{
 };
 typedef struct moldeImagen imagen;  
 struct moldeDatos{
-       int foco;
-       int bomba;
-       int leds;
-       int ventanas;
-       int puertas;
+       char nomCultivo[15];
+       char fecha[9];
        float temperatura;
        float humedad;
        float senterm;  
+       int tiempo;
+       int leds;
+       int bomba;
+       int ventanas;
+       int foco;
+       int puertas;
 };
 typedef struct moldeDatos datos;
 
-datos dataActual;       
+datos dataActual;     
+
 //--------------------------------------------------------COMUNICACION----------------------------------------------------------  
 void getData(){//Obtienen los datos del arduino y los almacena dentro de una estructura.
    unsigned char buf[4096], buf2[4096]; 
@@ -67,6 +73,23 @@ int checkPort(){
         return 1;
         }
 }
+//--------------------------------------------------------TIEMPO---------------------------------------------------------
+void tiempoAMin(){
+    time_t tiempo = time(0);
+    struct tm *tlocal = localtime(&tiempo);
+    int horaReal;
+    char fech[9], hors[3], mins[3];
+    strftime(fech,9,"%d/%m/%y",tlocal);
+    strftime(hors,3,"%H",tlocal);
+    strftime(mins,3,"%M",tlocal);
+    horaReal=(atoi(hors)*60)+atoi(mins);
+    strcpy(dataActual.fecha,fech);
+    dataActual.tiempo=horaReal;
+    return;
+}
+//--------------------------------------------------------CONFIGURACIONES-------------------------------------------------
+
+
 //--------------------------------------------------------INTERFAZ--------------------------------------------------------
 void prepVentana(){
      SetConsoleTitle("SISTEMA HIDROPONICO");
@@ -95,7 +118,7 @@ int printImagenFondo(int numeroFondo){
       return 0;
 }
 void imprimeConsolin(char *frase){
-     int x;
+    int x;
     textbackground(0);
     gotoxy(34,18);
     printf("%s", frase);
@@ -104,24 +127,25 @@ void imprimeConsolin(char *frase){
     for(x=1;x<=25;x++)
             putchar(176);
     textbackground(COLORFONDO);
-    
     return;      
 }
 
 //El buffer maximo es de 60 en X y 20 en Y
-//El buffer minimo es de 1 en X y 1 en Y
-
+//El buffer minimo es de 1 en X y 1 en Y*/
+//--------------------------------------------------MAIN---------------------------------------------------
 int main(){
     prepVentana();
-    //checkPort();
+    checkPort();
     printImagenFondo(1);
     getch();
     printImagenFondo(2);
-    imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
+    //imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
     getch();
     /*while(1){
     getData();
     Sleep(1000);
-    }*/
+    } */
+    tiempoAMin();
+    getch();
     return 0;
 }
