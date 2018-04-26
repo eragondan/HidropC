@@ -1,20 +1,20 @@
 111111111111111111111111111111111111111111111111111111111111
 1              1                                           1
-1              1   Fecha: DA/MS/AÑ    HR:MI                1
+1              1   Fecha:   /  /        :                  1
 1   Revision   1   Cultivo:                                1
 1     de       1                             Pasado        1
-1   Registros  1   Temperatura               NN.NNC        1
+1   Registros  1   Temperatura                 .  C        1
 1              1                                           1
-1              1   Humedad Aire              NN.NN%        1
+1              1   Humedad Aire                .  %        1
 1121212121212121                                           1
-1212121212121211   Sensacion Termica         NN.NN%        1
+1212121212121211   Sensacion Termica           .  %        1
 1              1                                           1
-1    Siguiente 1   Iluminacion               OFF           1
+1    Siguiente 1   Iluminacion                             1
 1              1                                           1
-1    Anterior  1   Riego                     OFF           1
+1    Anterior  1   Riego                                   1
 1              1                                           1
-1    Actualizar1   Ventilacion               OFF           1
+1    Actualizar1   Ventilacion                             1
 1              1                                           1
-1    Regresar  1   Calentador                OFF           1
+1    Regresar  1   Calentador                              1
 1              1                                           1
 111111111111111111111111111111111111111111111111111111111111

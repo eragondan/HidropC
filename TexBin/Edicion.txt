@@ -5,13 +5,13 @@
 111111111111111111111111111111111111111111111111111111111111
 1          Nombre del Cultivo:                             1
 1                             Max       Min                1
-1          Temperatura        NN   C    NN   C             1
+1          Temperatura             C         C             1
 1                                                          1
-1          Humedad Aire       NN   %    NN   %             1
+1          Humedad Aire            %         %             1
 1                             Inicio    Duracion           1
-1          Iluminacion        HR:MN     MNN min            1
+1          Iluminacion          :           min            1
 1                                                          1
-1          Riego              HR:MIN    MNN min            1
+1          Riego                :           min            1
 1                                                          1
 1          Regresar                                        1
 1                               2222222222222222222222222221
