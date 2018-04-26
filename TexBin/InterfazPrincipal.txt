@@ -1,17 +1,17 @@
 111111111111111111111111111111111111111111111111111111111111
-1   Sistema Hidroponico        Fecha: DA/MS/AÑOS  HR:MN    1
-1   Cultivo: NOMBRECULTIVO     Actual   Max      Min       1
+1   Sistema Hidroponico        Fecha: DA/MS/AÑ   HR:MN     1
+1   Cultivo:                   Actual   Max      Min       1
 1                                                          1
 1   Temperatura                NN.NNC   NN.NNC   NN.NNC    1
 1   Humedad Aire               NN.NN%   NN.NN%   NN.NN%    1
-1   Sensacion Termica          NN.NN%   NN.NN%   NN.NN%    1
+1   Sensacion Termica          NN.NN%                      1
 1                                                          1
 1   Opcion   Control           Estado   Activa   Duracion  1
 1                                                          1
-1            Iluminacion       ON       HR:MN    MNN min   1
-1            Riego             ON       HR:MN    MNN min   1
-1            Ventilacion       ON                          1
-1            Calentador        ON                          1
+1            Iluminacion        OFF     HR:MN     M  min   1
+1            Riego              OFF     HR:MN     M  min   1
+1            Ventilacion        OFF                        1
+1            Calentador         OFF                        1
 1                                                          1
 1            Guardar Registros                             1
 1            Revisar Registros  2222222222222222222222222221
