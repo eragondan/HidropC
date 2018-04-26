@@ -17,6 +17,8 @@ struct moldeConfig{
 };
 typedef struct moldeConfig configuracion;
 
+configuracion configuracionActual;
+
 struct moldePixel{
        int background;
        int color;
@@ -27,23 +29,43 @@ struct moldeImagen{
 };
 typedef struct moldeImagen imagen;  
 //---------------------------------------------
+void imprimeConsolin(char *frase){
+    int x;
+    textbackground(0);
+    gotoxy(34,18);
+    printf("%s", frase);
+    getch();
+    gotoxy(34,18);
+    for(x=1;x<=26;x++)
+            putchar(176);
+    textbackground(COLORFONDO);
+    return;      
+}
+void recibeString(char *algo){
+     gotoxy(34,18);
+     scanf("%s",algo);
+     return;
+     }
+//--------------------------------------------------------
 void modificaConfig(){
     char opciones(int *x){
          switch(*x){
              case 6: // Nombre del cultivo
-                  printf("di %i",*x);
+                  imprimeConsolin("Int Nombre Cultivo");
+                  recibeString(configuracionActual.nomCultivo);
+                  imprimeConsolin(configuracionActual.nomCultivo);
              break;
              case 8: //Temperatura max y min
-                  printf("di %i",*x);
+                  imprimeConsolin("Int max y min (con puntos)");
              break;
              case 10: //Humedad max y min
-                  printf("di %i",*x);
+                  imprimeConsolin("Int max y min (con puntos)");
              break;
              case 12: //Iluminacion
-                  printf("di %i",*x);
+                  imprimeConsolin("Int Ini(HH:MM) y dur(Min)");
              break;
              case 14: //Riego
-                   printf("di %i",*x);
+                  imprimeConsolin("Int Ini(HH:MM) y dur(Min)");
              break;
              case 16: //Regresar
                    return 'x';
@@ -74,6 +96,15 @@ void modificaConfig(){
        putchar(62);
     };
     return;
+}
+//--------------------------------------------------------------------------------------------------
+void modificaConfigBin(){
+      FILE *archivoConfig;
+      archivoConfig=fopen("..//config.cfg", "wb+");
+      fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
+      fwrite(&configuracionActual,sizeof(configuracion),1,archivoConfig);
+      fclose(archivoConfig);
+      printf(" Archivo Guardado\n");
 }
 //-------------------------------------Interfaz-----------------------------------------------------
 void prepVentana(){

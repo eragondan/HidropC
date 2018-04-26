@@ -160,7 +160,6 @@ void imprimeConsolin(char *frase){
     textbackground(COLORFONDO);
     return;      
 }
-
 //El buffer maximo es de 60 en X y 20 en Y
 //El buffer minimo es de 1 en X y 1 en Y*/
 //--------------------------------------------------MAIN---------------------------------------------------
@@ -172,10 +171,10 @@ int main(){
     getch();
     printImagenFondo(2);
     getch();
-    while(1){
+    /*while(1){
     getData();
     Sleep(1000);
-    } 
+    } */
     getch();
     return 0;
 }
