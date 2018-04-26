@@ -55,7 +55,7 @@ void tiempoIntToStr(int min, char *tiempo){//Recibe un integer y regresa en la c
      strcat(tiempo, mn);
      return;   
 }
-void imprimeConsolin(char *frase){ //Recibe cade y lo imprime en lugar especifico x=34 y=8
+void imprimeConsolin(char *frase){ //Recibe cadena y lo imprime en lugar especifico x=34 y=8
     int x;
     textbackground(0);
     gotoxy(34,18);
