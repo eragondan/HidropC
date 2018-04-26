@@ -81,13 +81,18 @@ void modificaPrincipal(){
        gotoxy(x, y);
        putchar('\0');
        switch (opcion){
+       
            case 'w'://arriba
-                if(y>11)
+                if(y>11){
                         y-=1;
+                        if(y==15)
+                         y=14;}
            break;
            case 's'://abajo
-                if(y<=18)
+                if(y<=18){
                         y+=1; 
+                        if(y==15)
+                         y=16;}
            break;  
            case 'd'://introducir
                opcion=opciones(&y);
