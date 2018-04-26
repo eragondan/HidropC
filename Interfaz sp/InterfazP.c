@@ -178,12 +178,12 @@ void printDatos(){
    gotoxy(51,12);
     printf("%i",configuracionActual.confRiegoDur); //Duracióo del Riego
         
-   return 0;
+   return;
 }
 //-------------------------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-   /*strcpy(dataActual.nomCultivo,"AJO"); 
+   strcpy(dataActual.nomCultivo,"AJO"); 
    strcpy(dataActual.fecha,"20/20/00");
    dataActual.temperatura=12.21;
    configuracionActual.confMaxTemperatura=23.32;
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
    dataActual.ventanas=0;
    dataActual.foco=0;
    configuracionActual.confIlumiDur=2;
-   configuracionActual.confRiegoDur=3;*/
+   configuracionActual.confRiegoDur=3;
    
    prepVentana();
    printImagenFondo(2);
