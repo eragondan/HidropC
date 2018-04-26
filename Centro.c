@@ -166,7 +166,7 @@ void imprimeConsolin(char *frase){
 int main(){
     char tiempo[6];
     prepVentana();
-    checkPort();
+    //checkPort();
     printImagenFondo(1);
     getch();
     printImagenFondo(2);

@@ -41,9 +41,30 @@ void imprimeConsolin(char *frase){
     textbackground(COLORFONDO);
     return;      
 }
+void imprimeConsolinF(float val, char *par){
+    int x;
+    textbackground(0);
+    gotoxy(34,18);
+    printf("%s",par);
+    gotoxy(39,18);
+    printf("%2.2f", val);
+    getch();
+    gotoxy(34,18);
+    for(x=1;x<=26;x++)
+            putchar(176);
+    textbackground(COLORFONDO);
+    return;      
+}
 void recibeString(char *algo){
      gotoxy(34,18);
      scanf("%s",algo);
+     return;
+     }
+void recibeFloat(float *algo){
+     float tempF;
+     gotoxy(34,18);
+     scanf("%f",&tempF);
+     *algo=tempF;
      return;
      }
 //--------------------------------------------------------
@@ -57,6 +78,12 @@ void modificaConfig(){
              break;
              case 8: //Temperatura max y min
                   imprimeConsolin("Int max y min (con puntos)");
+                  recibeFloat(&configuracionActual.confMaxTemperatura);
+                  imprimeConsolinF(configuracionActual.confMaxTemperatura, "MAX");
+                  getche();
+                  recibeFloat(&configuracionActual.confMinTemperatura);
+                  imprimeConsolinF(configuracionActual.confMinTemperatura, "MIN");
+                  
              break;
              case 10: //Humedad max y min
                   imprimeConsolin("Int max y min (con puntos)");
