@@ -21,19 +21,6 @@ typedef struct moldeDatos datos;
 
 datos dataActual; 
 
-/*struct moldeConfig{
-       char nomCultivo[15];
-       float confMaxTemperatura;
-       float confMinTemperatura;
-       float confMaxHumedad;
-       float confMinHumedad; 
-       int confIlumiIni;
-       int confIlumiDur;
-       int confRiegoIni;
-       int confRiegoDur; 
-};
-typedef struct moldeConfig configuracion;*/
-
 struct moldePixel{
        int background;
        int color;
@@ -43,18 +30,35 @@ struct moldeImagen{
        struct moldePixel pixel[20][60];
 };
 typedef struct moldeImagen imagen;  
-//---------------------------------------------
+
+//<-----------------------------------------------------BINARIOS---------------------------------------------------->
+void leeDataBin(int pos){ //lectura de doc binario datos
+      FILE *archivoData;
+      archivoData=fopen("..//data.dts", "rb");
+      fseek(archivoData,pos*sizeof(datos),SEEK_SET);
+      fread(&dataActual,sizeof(datos),1,archivoData);
+      fclose(archivoData);
+}
+
 void modificaRevision(){
+    int m=0;
     char opciones(int *x){
          switch(*x){
-             case 12: // Siguiente
-                  
+             case 12: // Registrar siguiente
+                  m++;
+                  leeDataBin(m);
+                  printDatos();
              break;
-             case 14: //Anterior
-                  
+             case 14: // Registro anterios
+                       if(m!=0){
+                         m--;
+                         leeDataBin(m);
+                         printDatos();
+                       }
              break;
              case 16: //Regresar
-                  
+                  printImagenFondo(2);
+                  return 'x';
              break;
          }
         return;
@@ -124,7 +128,7 @@ void printDatos(){
    gotoxy(46,8);
    printf("%.2f",dataActual.humedad); //Nivel de Humedad
    gotoxy(46,10);
-   printf("%.2f",dataActual.senterm); // Sensación Termica
+   printf("%.2f",dataActual.senterm); // SensaciÃ³n Termica
    gotoxy(46,12);
    if(dataActual.leds!=0)  //Luces Led
       printf("ON ");
@@ -151,15 +155,7 @@ void printDatos(){
 //--------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-   strcpy(dataActual.nomCultivo,"AJO"); 
-   strcpy(dataActual.fecha,"20/20/00");
-   dataActual.temperatura=12.21;
-   dataActual.humedad=21.12;
-   dataActual.senterm=78.89;
-   dataActual.leds=0;
-   dataActual.bomba=0;
-   dataActual.ventanas=0;
-   dataActual.foco=0;
+   leeDataBin(0);
    prepVentana();
    printImagenFondo(3);
    printDatos();
