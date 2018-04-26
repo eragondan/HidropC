@@ -48,16 +48,16 @@ void modificaRevision(){
     char opciones(int *x){
          switch(*x){
              case 12: // Siguiente
-                  printf("%i",*x);
+                  
              break;
              case 14: //Anterior
-                  printf("%i",*x);
+                  
              break;
              case 16: //Actualizar
-                  printf("%i",*x);
+                  
              break;
              case 18: //Regresar
-                  printf("%i",*x);
+                 
              break;
          }
         return;
@@ -114,11 +114,50 @@ int printImagenFondo(int numeroFondo){
       fclose(archivoImagen);
       return 0;
 }
-//-----------------------------------------------------------------------------------
+//------------------------------Datos----------------------------------------------
+void printDatos(){
+   gotoxy(29,4);
+     printf(dataActual.nomCultivo); //Nombre del Cultivo
+   gotoxy(27,3);
+     printf(dataActual.fecha); // Fecha 
+   gotoxy(39,3);
+     printf("30:70");
+   gotoxy(46,6);
+     printf("%.2f",dataActual.temperatura); //Temperatura 
+   gotoxy(46,8);
+     printf("%.2f",dataActual.humedad); //Nivel de Humedad
+   gotoxy(46,10);
+     printf("%.2f",dataActual.senterm); // Sensación Termica
+   gotoxy(46,12);
+     if(dataActual.leds!=0)  //Luces Led
+         printf("ON ");
+   gotoxy(46,14);
+     if(dataActual.bomba!=0) //Bomba
+         printf("ON ");
+   gotoxy(46,16);
+     if(dataActual.ventanas!=0) //Ventana
+         printf("ON ");
+   gotoxy(46,18);
+     if(dataActual.foco!=0) //Foco
+         printf("ON ");
+     return 0;
+     }
+        
+//--------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+   strcpy(dataActual.nomCultivo,"AJO"); 
+   strcpy(dataActual.fecha,"20/20/00");
+   dataActual.temperatura=12.21;
+   dataActual.humedad=21.12;
+   dataActual.senterm=78.89;
+   dataActual.leds=0;
+   dataActual.bomba=0;
+   dataActual.ventanas=0;
+   dataActual.foco=0;
    prepVentana();
    printImagenFondo(3);
+   printDatos();
    modificaRevision();
    getch();
    return 0;
