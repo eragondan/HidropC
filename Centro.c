@@ -35,7 +35,7 @@ struct moldeDatos{
 };
 typedef struct moldeDatos datos;
 
-datos dataActual;     
+datos dataActual;    
 
 //--------------------------------------------------------COMUNICACION----------------------------------------------------------  
 void getData(){//Obtienen los datos del arduino y los almacena dentro de una estructura.
@@ -62,10 +62,10 @@ void getData(){//Obtienen los datos del arduino y los almacena dentro de una est
           if(k==15) dataActual.senterm=atof(tempo);
       }
    }
-    //printf("foco: %i bomba: %i leds: %i ventanas: %i puertas: %i temp: %0.2f humedad: %0.2f senterm: %0.2f\n", dataActual.foco, dataActual.bomba, dataActual.leds, dataActual.ventanas, dataActual.puertas, dataActual.temperatura, dataActual.humedad, dataActual.senterm);
-    //printf("%s\n",mane);  
+    printf("foco: %i bomba: %i leds: %i ventanas: %i puertas: %i temp: %0.2f humedad: %0.2f senterm: %0.2f\n", dataActual.foco, dataActual.bomba, dataActual.leds, dataActual.ventanas, dataActual.puertas, dataActual.temperatura, dataActual.humedad, dataActual.senterm);
+    printf("%s\n",mane);  
 }
-int checkPort(){
+int checkPort(){//Checa el puerto
     char mode[]={'8','N','1',0};
     textcolor(12);   
     if(RS232_OpenComport(cport_nr, bdrate, mode)){
@@ -74,18 +74,49 @@ int checkPort(){
         }
 }
 //--------------------------------------------------------TIEMPO---------------------------------------------------------
-void tiempoAMin(){
+
+void ponFecha(){//Esta funcion fija dentro de la estructura dataActual la fecha como cadena.
+     time_t tiempo = time(0);
+     struct tm *tlocal = localtime(&tiempo);
+     char fech[9];
+     strftime(fech,9,"%d/%m/%y",tlocal);
+     strcpy(dataActual.fecha,fech);
+     }
+int tiempoStrToInt(char *tiempo){//Recibe un String y regresa en el integer el numero de minutos pasados en el dia.
+     int min=1, mtemp;;
+     char hr[3], mn[3];
+     hr[0]=tiempo[0];
+     hr[1]=tiempo[1];
+     hr[2]='\0';
+     mn[0]=tiempo[3];
+     mn[1]=tiempo[4];
+     mn[2]='\0';
+     min=atoi(hr);
+     mtemp=atoi(mn);
+     min=min*60+mtemp;
+     return min;
+     }
+void tiempoCompu(){//Esta funcion devuelve el tiempo de computadora en minutos transcurridos del dia.
     time_t tiempo = time(0);
     struct tm *tlocal = localtime(&tiempo);
     int horaReal;
-    char fech[9], hors[3], mins[3];
-    strftime(fech,9,"%d/%m/%y",tlocal);
-    strftime(hors,3,"%H",tlocal);
-    strftime(mins,3,"%M",tlocal);
-    horaReal=(atoi(hors)*60)+atoi(mins);
-    strcpy(dataActual.fecha,fech);
+    char hors[3], mins[3];
+    strftime(hors,6,"%H:%M",tlocal);
+    horaReal=tiempoStrToInt(hors);
     dataActual.tiempo=horaReal;
     return;
+}
+void tiempoIntToStr(int min, char *tiempo){//Recibe un integer y regresa en la cadena tiempo la hora deacuerdo a los minutos transcurridos.
+     int horas, minres;
+     char hor[3],mn[3];
+     horas = min / 60;
+     minres = min % 60;
+     itoa(minres,mn,10); 
+     itoa(horas,hor,10);
+     strcpy(tiempo, hor);
+     strcat(tiempo, ":");
+     strcat(tiempo, mn);
+     return;   
 }
 //--------------------------------------------------------CONFIGURACIONES-------------------------------------------------
 
@@ -134,18 +165,28 @@ void imprimeConsolin(char *frase){
 //El buffer minimo es de 1 en X y 1 en Y*/
 //--------------------------------------------------MAIN---------------------------------------------------
 int main(){
+    char tiempo[6];
     prepVentana();
     checkPort();
     printImagenFondo(1);
     getch();
     printImagenFondo(2);
-    //imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
     getch();
-    /*while(1){
+    while(1){
     getData();
     Sleep(1000);
-    } */
-    tiempoAMin();
+    } 
     getch();
     return 0;
 }
+//Ejemplos de uso de funciones
+    /*imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
+    printf("\n%i",tiempoStrToInt("15:23"));
+    tiempoAMin();
+    printf("%i\n", dataActual.tiempo);
+    tiempoIntToStr(dataActual.tiempo,tiempo);
+    puts(tiempo);
+    ponFecha();
+    printf("%s",dataActual.fecha);
+    tiempoCompu();
+    printf("%i",dataActual.tiempo);*/
