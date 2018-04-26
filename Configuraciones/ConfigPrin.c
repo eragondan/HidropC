@@ -27,8 +27,8 @@ struct moldePixel{
 struct moldeImagen{
        struct moldePixel pixel[20][60];
 };
-typedef struct moldeImagen imagen;  
-//---------------------------------------------
+typedef struct moldeImagen imagen;
+//-----------------------------------------------------  
 void imprimeConsolin(char *frase){
     int x;
     textbackground(0);
@@ -46,7 +46,46 @@ void recibeString(char *algo){
      scanf("%s",algo);
      return;
      }
-//--------------------------------------------------------
+void imprimeValoresConfiguracion(){
+     int x=31, y=6;
+     gotoxy(x,y);
+     printf("%s\n",configuracionActual.nomCultivo);
+     gotoxy(x,y+2);
+     printf("%2.2f\n",configuracionActual.confMaxTemperatura);
+     gotoxy(x+10,y+2);
+     printf("%2.2f\n",configuracionActual.confMinTemperatura);
+     gotoxy(x,y+4);
+     printf("%2.2f\n",configuracionActual.confMaxHumedad);
+     gotoxy(x+10,y+4);
+     printf("%2.2f\n",configuracionActual.confMinHumedad); 
+     gotoxy(x,y+6);
+     printf("%i\n",configuracionActual.confIlumiIni);//SePasaFuncion
+     gotoxy(x+10,y+6);
+     printf("%i\n",configuracionActual.confIlumiDur);
+     gotoxy(x,y+8);
+     printf("%i\n",configuracionActual.confRiegoIni);//SePasaFuncion
+     gotoxy(x+10,y+8);
+     printf("%i\n",configuracionActual.confRiegoDur);
+     gotoxy(x,y);
+   return;
+     }
+//--------------------------------------------------------------------------------------------------
+void modificaConfigBin(){
+      FILE *archivoConfig;
+      archivoConfig=fopen("..//config.cfg", "wb");
+      fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
+      fwrite(&configuracionActual,sizeof(configuracion),1,archivoConfig);
+      fclose(archivoConfig);
+      imprimeConsolin("Archivo Guardado");
+}
+void leeConfigBin(){
+      FILE *archivoConfig;
+      archivoConfig=fopen("..//config.cfg", "rb");
+      fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
+      fread(&configuracionActual,sizeof(configuracion),1,archivoConfig);
+      fclose(archivoConfig);
+     }
+//---------------------------------------------
 void modificaConfig(){
     char opciones(int *x){
          switch(*x){
@@ -71,11 +110,14 @@ void modificaConfig(){
                    return 'x';
              break;
          }
+        modificaConfigBin();
         return;
     }
     char opcion;
     int x=6, y=6;
     while(opcion!='x'){
+       leeConfigBin();
+       imprimeValoresConfiguracion();
        opcion=getch();
        gotoxy(x, y);
        putchar('\0');
@@ -97,15 +139,7 @@ void modificaConfig(){
     };
     return;
 }
-//--------------------------------------------------------------------------------------------------
-void modificaConfigBin(){
-      FILE *archivoConfig;
-      archivoConfig=fopen("..//config.cfg", "wb+");
-      fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
-      fwrite(&configuracionActual,sizeof(configuracion),1,archivoConfig);
-      fclose(archivoConfig);
-      printf(" Archivo Guardado\n");
-}
+
 //-------------------------------------Interfaz-----------------------------------------------------
 void prepVentana(){
      SetConsoleTitle("SISTEMA HIDROPONICO");
@@ -139,6 +173,15 @@ int main(int argc, char *argv[])
 {
    prepVentana();
    printImagenFondo(4);
+   /*strcpy(configuracionActual.nomCultivo,"nombrecin");
+   configuracionActual.confMaxTemperatura=10.10;
+   configuracionActual.confMinTemperatura=22.22;
+   configuracionActual.confMaxHumedad=33.33;
+   configuracionActual.confMinHumedad=44.44; 
+   configuracionActual.confIlumiIni=111;
+   configuracionActual.confIlumiDur=222;
+   configuracionActual.confRiegoIni=333;
+   configuracionActual.confRiegoDur=444; */
    modificaConfig();
    //getch();
    return 0;
