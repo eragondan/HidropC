@@ -44,44 +44,50 @@ struct moldeImagen{
 };
 typedef struct moldeImagen imagen;  
 //---------------------------------------------
-/*void modificaConfig(){
+void modificaPrincipal(){
     char opciones(int *x){
          switch(*x){
-             case 6: // Nombre del cultivo
-                  printf("di %i",*x);
+             case 11: // Iluminacion
+                  printf("%i",*x);
              break;
-             case 8: //Temperatura max y min
-                  printf("di %i",*x);
+             case 12: //Riego
+                  printf("%i",*x);
              break;
-             case 10: //Humedad max y min
-                  printf("di %i",*x);
+             case 13: //Ventilación
+                  printf("%i",*x);
              break;
-             case 12: //Iluminacion
-                  printf("di %i",*x);
+             case 14: //Calentador
+                  printf("%i",*x);
              break;
-             case 14: //Riego
-                   printf("di %i",*x);
+             case 16: // Guardar
+                  printf("%i",*x);
              break;
-             case 16: //Regresar
-                   return 'x';
+             case 17: //Revisar
+                  printf("%i",*x);
+             break;
+             case 18: //Editar
+                  printf("%i",*x);
+             break;
+             case 19: //Salir
+                  printf("%i",*x);
              break;
          }
         return;
     }
     char opcion;
-    int x=6, y=6;
+    int x=6, y=11;
     while(opcion!='x'){
        opcion=getch();
        gotoxy(x, y);
        putchar('\0');
        switch (opcion){
            case 'w'://arriba
-                if(y>6)
-                        y-=2;
+                if(y>11)
+                        y-=1;
            break;
            case 's'://abajo
-                if(y<=14)
-                        y+=2; 
+                if(y<=18)
+                        y+=1; 
            break;  
            case 'd'://introducir
                opcion=opciones(&y);
@@ -91,7 +97,7 @@ typedef struct moldeImagen imagen;
        putchar(62);
     };
     return;
-}*/
+}
 //-------------------------------------Interfaz-----------------------------------------------------
 void prepVentana(){
      SetConsoleTitle("SISTEMA HIDROPONICO");
@@ -125,7 +131,7 @@ int main(int argc, char *argv[])
 {
    prepVentana();
    printImagenFondo(2);
-   //modificaConfig();
+   modificaPrincipal();
    getch();
    return 0;
 }
