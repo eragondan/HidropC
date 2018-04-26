@@ -53,11 +53,8 @@ void modificaRevision(){
              case 14: //Anterior
                   
              break;
-             case 16: //Actualizar
+             case 16: //Regresar
                   
-             break;
-             case 18: //Regresar
-                 
              break;
          }
         return;
@@ -74,7 +71,7 @@ void modificaRevision(){
                         y-=2;
            break;
            case 's'://abajo
-                if(y<=16)
+                if(y<16)
                         y+=2; 
            break;  
            case 'd'://introducir
