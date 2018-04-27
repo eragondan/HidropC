@@ -31,7 +31,52 @@ struct moldeImagen{
 };
 typedef struct moldeImagen imagen;  
 
+//------------------------------Datos----------------------------------------------
+void printRegistros(){
+   gotoxy(29,4);
+   printf(dataActual.nomCultivo); //Nombre del Cultivo
+   gotoxy(27,3);
+   printf(dataActual.fecha); // Fecha 
+   gotoxy(39,3);
+   printf("30:70");
+   gotoxy(46,6);
+   printf("%.2f",dataActual.temperatura); //Temperatura 
+   gotoxy(46,8);
+   printf("%.2f",dataActual.humedad); //Nivel de Humedad
+   gotoxy(46,10);
+   printf("%.2f",dataActual.senterm); // Sensación Termica
+   gotoxy(46,12);
+   if(dataActual.leds!=0)  //Luces Led
+      printf("ON ");
+   else
+       printf("OFF");
+   gotoxy(46,14);
+   if(dataActual.bomba!=0) //Bomba
+      printf("ON ");
+   else
+       printf("OFF");
+   gotoxy(46,16);
+   if(dataActual.ventanas!=0) //Ventana
+      printf("ON ");
+   else
+       printf("OFF");
+   gotoxy(46,18);
+   if(dataActual.foco!=0) //Foco
+      printf("ON ");
+   else
+       printf("OFF");
+   return;
+}
+        
 //<-----------------------------------------------------BINARIOS---------------------------------------------------->
+void modificaDataBin(){
+      FILE *archivoData;
+      archivoData=fopen("..//data.dts", "wb");
+      fseek(archivoData,1*sizeof(datos),SEEK_END);
+      fwrite(&dataActual,sizeof(datos),1,archivoData);
+      fclose(archivoData);
+      //imprimeConsolin("Archivo Guardado");
+}
 void leeDataBin(int pos){ //lectura de doc binario datos
       FILE *archivoData;
       archivoData=fopen("..//data.dts", "rb");
@@ -47,13 +92,13 @@ void modificaRevision(){
              case 12: // Registrar siguiente
                   m++;
                   leeDataBin(m);
-                  printDatos();
+                  printRegistros();
              break;
              case 14: // Registro anterios
                        if(m!=0){
                          m--;
                          leeDataBin(m);
-                         printDatos();
+                         printRegistros();
                        }
              break;
              case 16: //Regresar
@@ -115,50 +160,13 @@ int printImagenFondo(int numeroFondo){
       fclose(archivoImagen);
       return 0;
 }
-//------------------------------Datos----------------------------------------------
-void printDatos(){
-   gotoxy(29,4);
-   printf(dataActual.nomCultivo); //Nombre del Cultivo
-   gotoxy(27,3);
-   printf(dataActual.fecha); // Fecha 
-   gotoxy(39,3);
-   printf("30:70");
-   gotoxy(46,6);
-   printf("%.2f",dataActual.temperatura); //Temperatura 
-   gotoxy(46,8);
-   printf("%.2f",dataActual.humedad); //Nivel de Humedad
-   gotoxy(46,10);
-   printf("%.2f",dataActual.senterm); // Sensación Termica
-   gotoxy(46,12);
-   if(dataActual.leds!=0)  //Luces Led
-      printf("ON ");
-   else
-       printf("OFF");
-   gotoxy(46,14);
-   if(dataActual.bomba!=0) //Bomba
-      printf("ON ");
-   else
-       printf("OFF");
-   gotoxy(46,16);
-   if(dataActual.ventanas!=0) //Ventana
-      printf("ON ");
-   else
-       printf("OFF");
-   gotoxy(46,18);
-   if(dataActual.foco!=0) //Foco
-      printf("ON ");
-   else
-       printf("OFF");
-   return 0;
-}
-        
 //--------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
    leeDataBin(0);
    prepVentana();
    printImagenFondo(3);
-   printDatos();
+   printRegistros();
    modificaRevision();
    getch();
    return 0;
