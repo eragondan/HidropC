@@ -8,8 +8,11 @@
 #define COLORFONDO 9
 #define COLORCONTRASTE 10
 
+//---------------------------------------------------VARIABLES GLOBALES-------------------------------------------------------- 
 int cport_nr=4  ,        //Puerto donde se coloca el arduino menos uno COM1=0
   bdrate=9600;       //Tiempo sincrono con arduino, Estandar: 9600
+int temMax, temMin, humMax, humMin, temIluIni, temRieIni;
+int xtemMax=1, xtemMin=1, xhumMax=1, xhumMin=1, xtemIluIni=1, xtemRieIni=1;
 //--------------------------------------------------------ESTRUCTURAS---------------------------------------------------------- 
 struct moldeConfig{
        char nomCultivo[15];
@@ -23,7 +26,6 @@ struct moldeConfig{
        int confRiegoDur; 
 };
 typedef struct moldeConfig configuracion; //Estructura de configuracion
-
 configuracion configuracionActual;
 
 struct moldePixel{
@@ -50,9 +52,10 @@ struct moldeDatos{
        int puertas;
 };
 typedef struct moldeDatos datos;//Estructura de datos
-
 datos dataActual; 
+
 //--------------------------------------------------------FUNCIONES DE TIEMPO-------------------------------------------------------
+void modificaPrincipal();
 void ponFecha(){//Esta funcion fija dentro de la estructura dataActual la fecha como cadena.
      time_t tiempo = time(0);
      struct tm *tlocal = localtime(&tiempo);
@@ -97,45 +100,74 @@ void tiempoIntToStr(int min, char *tiempo){//Recibe un integer y regresa en la c
      return;   
 }   
 //---------------------------------------------------FUNCIONES GENERALES DE INTERFAZ------------------------------------------------
-void imprimeConsolin(char *frase){ //Recibe cadena y lo imprime en lugar especifico x=34 y=8
-    int x;
-    textbackground(0);
-    gotoxy(34,18);
-    printf("%s", frase);
-    getch();
+void limpiaConsolin(){
+    int x; 
     gotoxy(34,18);
     for(x=1;x<=26;x++)
             putchar(176);
     textbackground(COLORFONDO);
+}
+void imprimeConsolin(char *frase){ //Recibe cadena y lo imprime en lugar especifico x=34 y=8
+    textbackground(0);
+    gotoxy(34,18);
+    printf("%s", frase);
+    getch();
+    limpiaConsolin();
+    return;      
+}
+void imprimeConsolinDelay(char *frase, int d){
+    textbackground(0);
+    gotoxy(34,18);
+    printf("%s", frase);
+    Sleep(d);
+    limpiaConsolin();
     return;      
 }
 void imprimeConsolinF(float val, char *par){ //Consolin que recibe floats
-    int x;
     textbackground(0);
     gotoxy(34,18);
     printf("%s",par);
     gotoxy(39,18);
     printf("%2.2f", val);
     getch();
-    gotoxy(34,18);
-    for(x=1;x<=26;x++)
-            putchar(176);
-    textbackground(COLORFONDO);
+    limpiaConsolin();
     return;      
 }
 void imprimeConsolinI(int val, char *par){ //Consolin que recibe ints 
-    int x;
     textbackground(0);
     gotoxy(34,18);
     printf("%s",par);
     gotoxy(39,18);
     printf("%i", val);
     getch();
-    gotoxy(34,18);
-    for(x=1;x<=26;x++)
-            putchar(176);
-    textbackground(COLORFONDO);
+    limpiaConsolin();
     return;      
+}
+void prepVentana(){
+     SetConsoleTitle("SISTEMA HIDROPONICO");
+     system("mode con: cols=61 lines=20");
+}
+int printImagenFondo(int numeroFondo){
+      numeroFondo-=1;
+      int x, y;
+      char letra;                  
+      imagen imagenFondo;
+      FILE *archivoImagen;
+      archivoImagen=fopen("fondos.hid", "rb");
+      fseek(archivoImagen,numeroFondo*sizeof(imagen),SEEK_SET);
+      fread(&imagenFondo,sizeof(imagen),1,archivoImagen);
+      for(y=0;y<20;y++)
+      for(x=0;x<60;x++){
+               letra=imagenFondo.pixel[y][x].caracter;
+               textcolor(imagenFondo.pixel[y][x].color);
+               textbackground(imagenFondo.pixel[y][x].background);
+               gotoxy(x+1,y+1);
+               putchar(letra);
+      }
+      textcolor(COLORCONTRASTE);
+      textbackground(COLORFONDO);
+      fclose(archivoImagen);
+      return 0;
 }
 void leerTiempo(int *algo){ //Recibe strings par mostrarlo en x=34 y=8 y convierte en int para guardar
      char lec[6];
@@ -239,16 +271,16 @@ void printRegistros(){
 }
 void modificaDataBin(){
       FILE *archivoData;
-      archivoData=fopen("..//data.dts", "ab");
-      fseek(archivoData,1*sizeof(datos),SEEK_END);
+      archivoData=fopen("data.dts", "ab");
+      fseek(archivoData,1*sizeof(datos),SEEK_SET);
       fwrite(&dataActual,sizeof(datos),1,archivoData);
       fclose(archivoData);
-      imprimeConsolin("Archivo Guardado");
+      imprimeConsolin("Ultimo registro guardado");
 }
 void leeDataBin(int pos){ //lectura de doc binario datos
       FILE *archivoData;
-      archivoData=fopen("..//data.dts", "rb");
-      fseek(archivoData,pos*sizeof(datos),SEEK_SET);
+      archivoData=fopen("data.dts", "rb");
+      fseek(archivoData,pos*sizeof(datos),SEEK_END);
       fread(&dataActual,sizeof(datos),1,archivoData);
       fclose(archivoData);
 }
@@ -257,19 +289,19 @@ void modificaRevision(){
     char opciones(int *x){
          switch(*x){
              case 12: // Registrar siguiente
-                  m++;
-                  leeDataBin(m);
-                  printRegistros();
+                  if(m!=0){
+                           m++;
+                           leeDataBin(m);
+                           printRegistros();
+                  }
              break;
              case 14: // Registro anterios
-                       if(m!=0){
                          m--;
                          leeDataBin(m);
                          printRegistros();
-                       }
              break;
              case 16: //Regresar
-                  printImagenFondo(2);
+                   printImagenFondo(2);
                    modificaPrincipal();
              break;
          }
@@ -332,7 +364,7 @@ void modificaConfigBin(){
       fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
       fwrite(&configuracionActual,sizeof(configuracion),1,archivoConfig);
       fclose(archivoConfig);
-      imprimeConsolin("Archivo Guardado");
+      imprimeConsolin("Configuracion Actualizada");
 }
 void leeConfigBin(){
       FILE *archivoConfig;
@@ -345,7 +377,7 @@ void modificaConfig(){
     char opciones(int *x){
          switch(*x){
              case 6: // Nombre del cultivo
-                  imprimeConsolin("Int Nombre Cultivo");
+                  imprimeConsolin("Introduce Nombre Cultivo");
                   recibeString(configuracionActual.nomCultivo);
                   imprimeConsolin(configuracionActual.nomCultivo);
              break;
@@ -386,7 +418,7 @@ void modificaConfig(){
              break;
              case 16: //Regresar
                   printImagenFondo(2);
-                   modificaPrincipal();
+                  modificaPrincipal();
              break;
          }
         modificaConfigBin();
@@ -418,32 +450,106 @@ void modificaConfig(){
     };
     return;
 }
-//--------------------------------------------------------INTERFACES--------------------------------------------------------
-void prepVentana(){
-     SetConsoleTitle("SISTEMA HIDROPONICO");
-     system("mode con: cols=61 lines=20");
+//-------------------------------------------------AUTOMATIZACION--------------------------------------------------------
+void temMaxEvent(){
+     imprimeConsolinDelay("Temp Max Alcanzada",500);
+     if(xtemMax==1){
+        temMax=1;
+        RS232_cputs(cport_nr,"vp");
+        xtemMax=0;
+     }
+     if(dataActual.temperatura<configuracionActual.confMaxTemperatura){
+          RS232_cputs(cport_nr,"vp");
+          temMax=0;
+          xtemMax=1;
+     }
+     return;
 }
-int printImagenFondo(int numeroFondo){
-      numeroFondo-=1;
-      int x, y;
-      char letra;                  
-      imagen imagenFondo;
-      FILE *archivoImagen;
-      archivoImagen=fopen("fondos.hid", "rb");
-      fseek(archivoImagen,numeroFondo*sizeof(imagen),SEEK_SET);
-      fread(&imagenFondo,sizeof(imagen),1,archivoImagen);
-      for(y=0;y<20;y++)
-      for(x=0;x<60;x++){
-               letra=imagenFondo.pixel[y][x].caracter;
-               textcolor(imagenFondo.pixel[y][x].color);
-               textbackground(imagenFondo.pixel[y][x].background);
-               gotoxy(x+1,y+1);
-               putchar(letra);
-      }
-      textcolor(COLORCONTRASTE);
-      textbackground(COLORFONDO);
-      fclose(archivoImagen);
-      return 0;
+void temMinEvent(){
+     imprimeConsolinDelay("Temp Min Alcanzada",500);
+     if(xtemMin==1){
+        temMin=1;
+        RS232_cputs(cport_nr,"f");
+        xtemMin=0;
+     }
+     if(dataActual.temperatura>configuracionActual.confMinTemperatura){
+          RS232_cputs(cport_nr,"f");
+          temMin=0;
+          xtemMin=1;
+     }
+     return;
+}
+void humMaxEvent(){
+     imprimeConsolinDelay("Hume Max Alcanzada",500);
+     if(xhumMax==1){
+        humMax=1;
+        RS232_cputs(cport_nr,"vp");
+        xhumMax=0;
+     }
+     if(dataActual.temperatura<configuracionActual.confMaxHumedad){
+          RS232_cputs(cport_nr,"vp");
+          humMax=0;
+          xhumMax=1;
+     }
+     return;
+}
+void humMinEvent(){
+     imprimeConsolinDelay("Hume Min Alcanzada",500);
+     if(xhumMin==1){
+        humMin=1;
+        RS232_cputs(cport_nr,"f");
+        xhumMin=0;
+     }
+     if(dataActual.temperatura>configuracionActual.confMinHumedad){
+          RS232_cputs(cport_nr,"f");
+          humMin=0;
+          xhumMin=1;
+     }
+     return;
+}
+void temIluIniEvent(){
+     imprimeConsolinDelay("Ini ilumi program",500);
+     if(xtemIluIni==1){
+        temIluIni=1;
+        RS232_cputs(cport_nr,"l");
+        xtemIluIni=0;
+     }
+     if(dataActual.tiempo==configuracionActual.confIlumiIni+configuracionActual.confIlumiDur){
+          RS232_cputs(cport_nr,"l");
+          temIluIni=0;
+          xtemIluIni=1;
+     }
+     return;
+}
+void temRieIniEvent(){
+     imprimeConsolinDelay("Ini riego program",500);
+     if(xtemRieIni==1){
+        temRieIni=1;
+        RS232_cputs(cport_nr,"b");
+        xtemRieIni=0;
+     }
+     if(dataActual.tiempo==configuracionActual.confRiegoIni+configuracionActual.confRiegoDur){
+          RS232_cputs(cport_nr,"b");
+          temRieIni=0;
+          xtemRieIni=1;
+     }
+     return;
+}
+void automatiza(){
+     int tiempo=200;
+     if(dataActual.temperatura==configuracionActual.confMaxTemperatura||temMax==1)
+                  temMaxEvent();
+     if(dataActual.temperatura==configuracionActual.confMinTemperatura||temMin==1)
+                  temMinEvent();
+     if(dataActual.humedad==configuracionActual.confMaxHumedad||humMax==1)
+                  humMaxEvent();
+     if(dataActual.humedad==configuracionActual.confMinHumedad||humMin==1)
+                  humMinEvent();
+     if(dataActual.tiempo==configuracionActual.confIlumiIni||temIluIni==1)
+                  temIluIniEvent();
+     if(dataActual.tiempo==configuracionActual.confRiegoIni||temRieIni==1)
+                  temRieIniEvent();
+   return;         
 }
 //----------------------------------------FUNCIONES DE INTERFAZ PRINCIPAL--------------------------------------------------------
 void printDatos(){
@@ -454,7 +560,7 @@ void printDatos(){
    gotoxy(39,2);
    printf("%s",dataActual.fecha); // Fecha 
    gotoxy(50,2);
-   printf("%s",tiempoTemp);
+   printf("%s",tiempoTemp);//Tiempo
    gotoxy(32,5);
    printf("%.2f",dataActual.temperatura); //Temperatura 
    gotoxy(41,5);
@@ -489,6 +595,11 @@ void printDatos(){
      printf("ON ");
    else
      printf("OFF");
+   gotoxy(32,15);
+   if(dataActual.puertas!=0) //Puertas
+     printf("ON ");
+   else
+     printf("OFF");
    gotoxy(41,11); // Tiempo Inicio de Iluminacion
    tiempoIntToStr(configuracionActual.confIlumiIni,tiempoTemp);
    printf("%s",tiempoTemp);
@@ -498,24 +609,33 @@ void printDatos(){
    gotoxy(51,11);
    printf("%i",configuracionActual.confIlumiDur); // Duración de la Ilumninacion
    gotoxy(51,12);
-   printf("%i",configuracionActual.confRiegoDur); //Duracióo del Riego
+   printf("%i",configuracionActual.confRiegoDur); //Duracion del Riego
         
    return;
 }
 void modificaPrincipal(){
     char opciones(int *x){
+    int tiempoEspera=600;
          switch(*x){
              case 11: // Iluminacion
                 RS232_cputs(cport_nr,"l");
+                imprimeConsolinDelay("Mandando iluminacion",tiempoEspera);
              break;
              case 12: //Riego
                 RS232_cputs(cport_nr,"b");
+                imprimeConsolinDelay("Mandando riego",tiempoEspera);
              break;
              case 13: //Ventilación
                 RS232_cputs(cport_nr,"v");
+                imprimeConsolinDelay("Mandando ventilacion",tiempoEspera);
              break;
              case 14: //Calentador
                 RS232_cputs(cport_nr,"f"); 
+                imprimeConsolinDelay("Mandando calentador",tiempoEspera);
+             break;
+             case 15: //Puerta
+                RS232_cputs(cport_nr,"p");
+                imprimeConsolinDelay("Mandando puertas",tiempoEspera);
              break;
              case 16: // Guardar
                   modificaDataBin();
@@ -545,13 +665,8 @@ void modificaPrincipal(){
        ponFecha();
        tiempoCompu();
        strcpy(dataActual.nomCultivo,configuracionActual.nomCultivo);
+       automatiza();
        printDatos();
-       /*if(!feof(stdin)){
-          opcion=getch();              
-       }*/
-       /*fseek (stdin, 0, SEEK_END);
-       int num = ftell (stdin);
-       printf("%i", num);*/
        if(kbhit())
                  opcion=getch();
        Sleep(200);
@@ -559,16 +674,12 @@ void modificaPrincipal(){
        putchar('\0');
        switch (opcion){
            case 'w'://arriba
-                if(y>11){
+                if(y>11)
                         y-=1;
-                        if(y==15)
-                         y=14;}
            break;
            case 's'://abajo
-                if(y<=18){
+                if(y<=18)
                         y+=1; 
-                        if(y==15)
-                         y=16;}
            break;  
            case 'd'://introducir
                opcion=opciones(&y);
@@ -580,55 +691,15 @@ void modificaPrincipal(){
     };
     return;
 }
-//El buffer maximo es de 60 en X y 20 en Y
-//El buffer minimo es de 1 en X y 1 en Y*/
 //--------------------------------------------------MAIN---------------------------------------------------
 int main(){
-    _setcursortype(NULL);
     prepVentana();
     checkPort();
+    _setcursortype(NULL);
     printImagenFondo(1);
     getch();
     printImagenFondo(2);
-    /*strcpy(dataActual.nomCultivo,"AJO"); 
-    strcpy(dataActual.fecha,"21/07/21");
-    dataActual.temperatura=12.21;
-    configuracionActual.confMaxTemperatura=23.32;
-    configuracionActual.confMinTemperatura=32.23;
-    dataActual.humedad=21.12;
-    configuracionActual.confMaxHumedad=34.43;
-    configuracionActual.confMinHumedad=43.34;
-    dataActual.senterm=78.89;
-    dataActual.leds=0;
-    dataActual.bomba=0;
-    dataActual.ventanas=0;
-    dataActual.foco=0;
-    configuracionActual.confIlumiDur=2;
-    configuracionActual.confRiegoDur=3;*/
+    leeConfigBin();
     modificaPrincipal();
     return 0;
 }
-
-    /*   prepVentana();
-   printImagenFondo(2);
-   printDatos();
-   modificaPrincipal();
-   getch();*/
-    //return 0;
-
-//Ejemplos de uso de funciones
-    /*imprimeConsolin("MAXIMO DE ESTE CUADRO 25");
-    printf("\n%i",tiempoStrToInt("15:23"));
-    tiempoAMin();
-    printf("%i\n", dataActual.tiempo);
-    tiempoIntToStr(dataActual.tiempo,tiempo);
-    puts(tiempo);
-    ponFecha();
-    printf("%s",dataActual.fecha);
-    tiempoCompu();
-    printf("%i",dataActual.tiempo);*/
-    //Pedir datos
-    /*while(1){
-
-    Sleep(1000);
-    } */
