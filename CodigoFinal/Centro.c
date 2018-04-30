@@ -10,7 +10,7 @@
 
 //---------------------------------------------------VARIABLES GLOBALES-------------------------------------------------------- 
 int cport_nr=4  ,        //Puerto donde se coloca el arduino menos uno COM1=0
-  bdrate=9600;       //Tiempo sincrono con arduino, Estandar: 9600
+  bdrate=9600;       //Tiempo sincro     no con arduino, Estandar: 9600
 int temMax, temMin, humMax, humMin, temIluIni, temRieIni;
 int xtemMax=1, xtemMin=1, xhumMax=1, xhumMin=1, xtemIluIni=1, xtemRieIni=1;
 //--------------------------------------------------------ESTRUCTURAS---------------------------------------------------------- 
@@ -451,6 +451,15 @@ void modificaConfig(){
     return;
 }
 //-------------------------------------------------AUTOMATIZACION--------------------------------------------------------
+int eventLibres(int n){
+     if(temMax==1&&n!=1)return 0;
+     if(temMin==1&&n!=2)return 0;
+     if(humMax==1&&n!=3)return 0;
+     if(humMin==1&&n!=4)return 0;
+     if(temIluIni==1&&n!=5)return 0;
+     if(temRieIni==1&&n!=6)return 0;
+     return 1;
+}
 void temMaxEvent(){
      imprimeConsolinDelay("Temp Max Alcanzada",500);
      if(xtemMax==1){
@@ -537,17 +546,17 @@ void temRieIniEvent(){
 }
 void automatiza(){
      int tiempo=200;
-     if(dataActual.temperatura==configuracionActual.confMaxTemperatura||temMax==1)
+     if((dataActual.temperatura>=configuracionActual.confMaxTemperatura||temMax==1)&&eventLibres(1)==1)
                   temMaxEvent();
-     if(dataActual.temperatura==configuracionActual.confMinTemperatura||temMin==1)
+     if((dataActual.temperatura<=configuracionActual.confMinTemperatura||temMin==1)&&eventLibres(2)==1)
                   temMinEvent();
-     if(dataActual.humedad==configuracionActual.confMaxHumedad||humMax==1)
+     if((dataActual.humedad>=configuracionActual.confMaxHumedad||humMax==1)&&eventLibres(3)==1)
                   humMaxEvent();
-     if(dataActual.humedad==configuracionActual.confMinHumedad||humMin==1)
+     if((dataActual.humedad<=configuracionActual.confMinHumedad||humMin==1)&&eventLibres(4)==1)
                   humMinEvent();
-     if(dataActual.tiempo==configuracionActual.confIlumiIni||temIluIni==1)
+     if((dataActual.tiempo==configuracionActual.confIlumiIni||temIluIni==1)&&eventLibres(5)==1)
                   temIluIniEvent();
-     if(dataActual.tiempo==configuracionActual.confRiegoIni||temRieIni==1)
+     if((dataActual.tiempo==configuracionActual.confRiegoIni||temRieIni==1)&&eventLibres(6)==1)
                   temRieIniEvent();
    return;         
 }
@@ -596,10 +605,6 @@ void printDatos(){
    else
      printf("OFF");
    gotoxy(32,15);
-   if(dataActual.puertas!=0) //Puertas
-     printf("ON ");
-   else
-     printf("OFF");
    gotoxy(41,11); // Tiempo Inicio de Iluminacion
    tiempoIntToStr(configuracionActual.confIlumiIni,tiempoTemp);
    printf("%s",tiempoTemp);
@@ -626,16 +631,12 @@ void modificaPrincipal(){
                 imprimeConsolinDelay("Mandando riego",tiempoEspera);
              break;
              case 13: //Ventilación
-                RS232_cputs(cport_nr,"v");
+                RS232_cputs(cport_nr,"vp");
                 imprimeConsolinDelay("Mandando ventilacion",tiempoEspera);
              break;
              case 14: //Calentador
                 RS232_cputs(cport_nr,"f"); 
                 imprimeConsolinDelay("Mandando calentador",tiempoEspera);
-             break;
-             case 15: //Puerta
-                RS232_cputs(cport_nr,"p");
-                imprimeConsolinDelay("Mandando puertas",tiempoEspera);
              break;
              case 16: // Guardar
                   modificaDataBin();
@@ -665,7 +666,7 @@ void modificaPrincipal(){
        ponFecha();
        tiempoCompu();
        strcpy(dataActual.nomCultivo,configuracionActual.nomCultivo);
-       automatiza();
+      // automatiza();
        printDatos();
        if(kbhit())
                  opcion=getch();
@@ -676,10 +677,14 @@ void modificaPrincipal(){
            case 'w'://arriba
                 if(y>11)
                         y-=1;
+                        if(y==15)
+                                 y--;
            break;
            case 's'://abajo
                 if(y<=18)
                         y+=1; 
+                         if(y==15)
+                                 y++;
            break;  
            case 'd'://introducir
                opcion=opciones(&y);

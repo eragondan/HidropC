@@ -12,7 +12,7 @@
 1            Riego                        :          min   1
 1            Ventilacion                                   1
 1            Calentador                                    1
-1            Puerta                                        1
+1                                                          1
 1            Guardar Registros                             1
 1            Revisar Registros  2222222222222222222222222221
 1            Editar Controles   2222222222222222222222222221
