@@ -4,26 +4,38 @@
 CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
-RES  = 
-OBJ  = Centro.o $(RES)
-LINKOBJ  = Centro.o $(RES)
-LIBS =  -L"C:/Dev-Cpp/lib" -lconio 
-INCS =  -I"C:/Dev-Cpp/include" 
-CXXINCS =  -I"C:/Dev-Cpp/include/c++/3.3.1"  -I"C:/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Dev-Cpp/include" 
-BIN  = HidroponiaEnC.exe
+RES  = lib/HidroponiaEnC_private.res
+OBJ  = lib/Centro.o lib/estructuras.o lib/funGenInterfaz.o lib/funTiempo.o $(RES)
+LINKOBJ  = lib/Centro.o lib/estructuras.o lib/funGenInterfaz.o lib/funTiempo.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib" -L"C:/Users/Prepa 6/Desktop/HidropC/CodigoFinal/lib" -lconio  
+INCS =  -I"C:/Dev-Cpp/include"  -I"C:/Users/Prepa 6/Desktop/HidropC/CodigoFinal/include" 
+CXXINCS =  -I"C:/Dev-Cpp/include/c++/3.3.1"  -I"C:/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Dev-Cpp/include"  -I"C:/Users/Prepa 6/Desktop/HidropC/CodigoFinal/include" 
+BIN  = Hidro.exe
 CXXFLAGS = $(CXXINCS)  
 CFLAGS = $(INCS)  
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before HidroponiaEnC.exe all-after
+all: all-before Hidro.exe all-after
 
 
 clean: clean-custom
 	rm -f $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(LINKOBJ) -o "HidroponiaEnC.exe" $(LIBS)
+	$(CC) $(LINKOBJ) -o "Hidro.exe" $(LIBS)
 
-Centro.o: Centro.c
-	$(CC) -c Centro.c -o Centro.o $(CFLAGS)
+lib/Centro.o: include/Centro.c
+	$(CC) -c include/Centro.c -o lib/Centro.o $(CFLAGS)
+
+lib/estructuras.o: include/estructuras.c
+	$(CC) -c include/estructuras.c -o lib/estructuras.o $(CFLAGS)
+
+lib/funGenInterfaz.o: include/funGenInterfaz.c
+	$(CC) -c include/funGenInterfaz.c -o lib/funGenInterfaz.o $(CFLAGS)
+
+lib/funTiempo.o: include/funTiempo.c
+	$(CC) -c include/funTiempo.c -o lib/funTiempo.o $(CFLAGS)
+
+lib/HidroponiaEnC_private.res: HidroponiaEnC_private.rc 
+	$(WINDRES) -i HidroponiaEnC_private.rc --input-format=rc -o lib/HidroponiaEnC_private.res -O coff  --include-dir C:/Users/PREPA6~1/Desktop/HidropC/CODIGO~2/reso

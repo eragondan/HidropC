@@ -1,200 +1,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
-#include <time.h>
 #include <string.h>
 #include <Windows.h>
 #include "rs232.c"
-#define COLORFONDO 9
-#define COLORCONTRASTE 10
+#include "estructuras.c"
 
 //---------------------------------------------------VARIABLES GLOBALES-------------------------------------------------------- 
-int cport_nr=4  ,        //Puerto donde se coloca el arduino menos uno COM1=0
+int cport_nr=5  ,        //Puerto donde se coloca el arduino menos uno COM1=0
   bdrate=9600;       //Tiempo sincro     no con arduino, Estandar: 9600
 int temMax, temMin, humMax, humMin, temIluIni, temRieIni;
 int xtemMax=1, xtemMin=1, xhumMax=1, xhumMin=1, xtemIluIni=1, xtemRieIni=1;
 //--------------------------------------------------------ESTRUCTURAS---------------------------------------------------------- 
-struct moldeConfig{
-       char nomCultivo[15];
-       float confMaxTemperatura;
-       float confMinTemperatura;
-       float confMaxHumedad;
-       float confMinHumedad; 
-       int confIlumiIni;
-       int confIlumiDur;
-       int confRiegoIni;
-       int confRiegoDur; 
-};
-typedef struct moldeConfig configuracion; //Estructura de configuracion
 configuracion configuracionActual;
-
-struct moldePixel{
-       int background;
-       int color;
-       char caracter;
-};
-struct moldeImagen{
-       struct moldePixel pixel[20][60];
-};
-typedef struct moldeImagen imagen;  //Molde de la estructura de imagen
-
-struct moldeDatos{
-       char nomCultivo[15];
-       char fecha[9];
-       float temperatura;
-       float humedad;
-       float senterm;  
-       int tiempo;
-       int leds;
-       int bomba;
-       int ventanas;
-       int foco;
-       int puertas;
-};
-typedef struct moldeDatos datos;//Estructura de datos
 datos dataActual; 
-
 //--------------------------------------------------------FUNCIONES DE TIEMPO-------------------------------------------------------
-void modificaPrincipal();
-void ponFecha(){//Esta funcion fija dentro de la estructura dataActual la fecha como cadena.
-     time_t tiempo = time(0);
-     struct tm *tlocal = localtime(&tiempo);
-     char fech[9];
-     strftime(fech,9,"%d/%m/%y",tlocal);
-     strcpy(dataActual.fecha,fech);
-}
-int tiempoStrToInt(char *tiempo){//Recibe un String y regresa en el integer el numero de minutos pasados en el dia.
-     int min=1, mtemp;;
-     char hr[3], mn[3];
-     hr[0]=tiempo[0];
-     hr[1]=tiempo[1];
-     hr[2]='\0';
-     mn[0]=tiempo[3];
-     mn[1]=tiempo[4];
-     mn[2]='\0';
-     min=atoi(hr);
-     mtemp=atoi(mn);
-     min=min*60+mtemp;
-     return min;
-}
-void tiempoCompu(){//Esta funcion devuelve el tiempo de computadora en minutos transcurridos del dia.
-    time_t tiempo = time(0);
-    struct tm *tlocal = localtime(&tiempo);
-    int horaReal;
-    char hors[3], mins[3];
-    strftime(hors,6,"%H:%M",tlocal);
-    horaReal=tiempoStrToInt(hors);
-    dataActual.tiempo=horaReal;
-    return;
-}
-void tiempoIntToStr(int min, char *tiempo){//Recibe un integer y regresa en la cadena tiempo la hora deacuerdo a los minutos transcurridos.
-     int horas, minres;
-     char hor[3],mn[3];
-     horas = min / 60;
-     minres = min % 60;
-     itoa(minres,mn,10); 
-     itoa(horas,hor,10);
-     strcpy(tiempo, hor);
-     strcat(tiempo, ":");
-     strcat(tiempo, mn);
-     return;   
-}   
+void modificaPrincipal();   
 //---------------------------------------------------FUNCIONES GENERALES DE INTERFAZ------------------------------------------------
-void limpiaConsolin(){
-    int x; 
-    gotoxy(34,18);
-    for(x=1;x<=26;x++)
-            putchar(176);
-    textbackground(COLORFONDO);
-}
-void imprimeConsolin(char *frase){ //Recibe cadena y lo imprime en lugar especifico x=34 y=8
-    textbackground(0);
-    gotoxy(34,18);
-    printf("%s", frase);
-    getch();
-    limpiaConsolin();
-    return;      
-}
-void imprimeConsolinDelay(char *frase, int d){
-    textbackground(0);
-    gotoxy(34,18);
-    printf("%s", frase);
-    Sleep(d);
-    limpiaConsolin();
-    return;      
-}
-void imprimeConsolinF(float val, char *par){ //Consolin que recibe floats
-    textbackground(0);
-    gotoxy(34,18);
-    printf("%s",par);
-    gotoxy(39,18);
-    printf("%2.2f", val);
-    getch();
-    limpiaConsolin();
-    return;      
-}
-void imprimeConsolinI(int val, char *par){ //Consolin que recibe ints 
-    textbackground(0);
-    gotoxy(34,18);
-    printf("%s",par);
-    gotoxy(39,18);
-    printf("%i", val);
-    getch();
-    limpiaConsolin();
-    return;      
-}
-void prepVentana(){
-     SetConsoleTitle("SISTEMA HIDROPONICO");
-     system("mode con: cols=61 lines=20");
-}
-int printImagenFondo(int numeroFondo){
-      numeroFondo-=1;
-      int x, y;
-      char letra;                  
-      imagen imagenFondo;
-      FILE *archivoImagen;
-      archivoImagen=fopen("fondos.hid", "rb");
-      fseek(archivoImagen,numeroFondo*sizeof(imagen),SEEK_SET);
-      fread(&imagenFondo,sizeof(imagen),1,archivoImagen);
-      for(y=0;y<20;y++)
-      for(x=0;x<60;x++){
-               letra=imagenFondo.pixel[y][x].caracter;
-               textcolor(imagenFondo.pixel[y][x].color);
-               textbackground(imagenFondo.pixel[y][x].background);
-               gotoxy(x+1,y+1);
-               putchar(letra);
-      }
-      textcolor(COLORCONTRASTE);
-      textbackground(COLORFONDO);
-      fclose(archivoImagen);
-      return 0;
-}
-void leerTiempo(int *algo){ //Recibe strings par mostrarlo en x=34 y=8 y convierte en int para guardar
-     char lec[6];
-     int p;
-     gotoxy(34,18);
-     scanf("%s",lec);
-     imprimeConsolin(lec);
-     *algo=tiempoStrToInt(lec);
-     return;
-}
-void recibeString(char *algo){ //Recibe string para guardar en struct
-     gotoxy(34,18);
-     scanf("%s",algo);
-     return;
-}
-void recibeInt(int *algo){ //Recibe int para guardar en struct
-     gotoxy(34,18);
-     scanf("%i",algo);
-     return;
-}
-void recibeFloat(float *algo){ //Recibe float para guardar en struct
-     float tempF;
-     gotoxy(34,18);
-     scanf("%f",&tempF);
-     *algo=tempF;
-     return;
-}
 //-----------------------------------------------------COMUNICACION CON ARDUINO-----------------------------------------------------
 void getData(){//Obtienen los datos del arduino y los almacena dentro de una estructura.
    unsigned char buf[4096]; 
@@ -271,7 +93,7 @@ void printRegistros(){
 }
 void modificaDataBin(){
       FILE *archivoData;
-      archivoData=fopen("data.dts", "ab");
+      archivoData=fopen("recursos//data.dts", "ab");
       fseek(archivoData,1*sizeof(datos),SEEK_SET);
       fwrite(&dataActual,sizeof(datos),1,archivoData);
       fclose(archivoData);
@@ -279,7 +101,7 @@ void modificaDataBin(){
 }
 void leeDataBin(int pos){ //lectura de doc binario datos
       FILE *archivoData;
-      archivoData=fopen("data.dts", "rb");
+      archivoData=fopen("recursos//data.dts", "rb");
       fseek(archivoData,pos*sizeof(datos),SEEK_END);
       fread(&dataActual,sizeof(datos),1,archivoData);
       fclose(archivoData);
@@ -360,7 +182,7 @@ void imprimeValoresConfiguracion(){
      }
 void modificaConfigBin(){
       FILE *archivoConfig;
-      archivoConfig=fopen("config.cfg", "wb");
+      archivoConfig=fopen("recursos//config.cfg", "wb");
       fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
       fwrite(&configuracionActual,sizeof(configuracion),1,archivoConfig);
       fclose(archivoConfig);
@@ -368,7 +190,7 @@ void modificaConfigBin(){
 }
 void leeConfigBin(){
       FILE *archivoConfig;
-      archivoConfig=fopen("config.cfg", "rb");
+      archivoConfig=fopen("recursos//config.cfg", "rb");
       fseek(archivoConfig,0*sizeof(configuracion),SEEK_SET);
       fread(&configuracionActual,sizeof(configuracion),1,archivoConfig);
       fclose(archivoConfig);
@@ -663,8 +485,8 @@ void modificaPrincipal(){
     int x=6, y=11;
     while(opcion!='x'){
        getData();
-       ponFecha();
-       tiempoCompu();
+       ponFecha(dataActual.fecha);
+       tiempoCompu(&dataActual.tiempo);
        strcpy(dataActual.nomCultivo,configuracionActual.nomCultivo);
       // automatiza();
        printDatos();

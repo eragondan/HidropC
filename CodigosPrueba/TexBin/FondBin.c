@@ -70,7 +70,7 @@
       char letra;                  
       imagen imagenFondo;
       FILE *archivoImagen;
-      archivoImagen=fopen("..//fondos.hid", "rb");
+      archivoImagen=fopen("..//..//CodigoFinal//recursos//fondos.hid", "rb");
       fseek(archivoImagen,numeroFondo*sizeof(imagen),SEEK_SET);
       fread(&imagenFondo,sizeof(imagen),1,archivoImagen);
       for(y=0;y<20;y++)
